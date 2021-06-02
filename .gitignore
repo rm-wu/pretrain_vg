@@ -1,0 +1,15 @@
+runs
+__pycache__
+.spyproject
+
+cl_*
+
+venv/
+
+.idea/
+__MACOSX/
+
+**/.DS_Store
+
+test
+tmp*
