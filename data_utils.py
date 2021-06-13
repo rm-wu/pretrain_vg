@@ -36,9 +36,10 @@ def generate_size_info_df(df) -> pd.DataFrame:
 
 
 if __name__ == '__main__':
-    csv2pkl_train('/home/valerio/datasets/classification_datasets/glv2/train', img_sizes=False)
-
+    # csv2pkl_train('/home/valerio/datasets/classification_datasets/glv2/train', img_sizes=False)
+    csv2pkl_train('/home/riccardom/datasets/gldv2/train', img_sizes=False, pkl_name="train_df_")
 '''
+#BATCH --job-name=CRN_pretrain_vgginit
     test = pd.read_csv('../input/gld_v2/test.csv', index_col=[0]).sort_index()
     test_paths = list(Path('../input/gld_v2/test').glob('**/*.jpg'))
     test = generate_size_info_df(test_paths, test)

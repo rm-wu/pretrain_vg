@@ -36,7 +36,7 @@ device = args.device
 # ---- Dataloaders ----
 # TODO: move to parser this parameter (note in benchmarking_vg this is done in another way)
 #
-df_path = 'train_df.pkl'
+df_path = 'train_df_.pkl'
 train_dl, valid_dl, num_classes = dataset.prepare_dataloaders(dataset_name=args.dataset_name,
                                                               df_path=df_path,
                                                               train_batch_size=args.train_batch_size,
@@ -105,7 +105,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         train_loss.update(loss.item(), batch_size)
         train_acc.update(acc, batch_size)
 
-        if i % 100 == 99:
+        if i % 10000 == 9999:
             logging.info(f'{i} | loss: {train_loss.avg:.4f} | acc: {train_acc.avg:.4f}')
 
     logging.info(f"Training: Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
@@ -153,7 +153,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
     # If accuracy did not improve for "many" epochs, stop training
     if is_best:
-        logging.info(f"Improved: previous best R@5 = {best_acc:.4f}, current R@5 = {valid_acc:.4f}")
+        logging.info(f"Improved: previous best R@5 = {best_acc:.4f}, current R@5 = {valid_acc.avg:.4f}")
         best_acc = valid_acc.avg
         not_improved_num = 0
     else:
