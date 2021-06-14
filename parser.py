@@ -39,7 +39,7 @@ def parse_arguments():
                         help="Percentage of the train set to use as validation set.")
     parser.add_argument("--num_workers", type=int, default=multiprocessing.cpu_count(),
                         help="num_workers for all dataloaders")
-    parser.add_argument('--resize_shape', type=int, default=[480, 640], nargs=2,
+    parser.add_argument('--resize_shape', type=int, default=[224, 224], nargs=2,
                         help="Resizing shape for images (HxW).")
 
     # ---- loss_module Arguments ----
@@ -57,16 +57,14 @@ def parse_arguments():
     parser.add_argument("--optim", type=str, default="sgd", help="_", choices=["adam", "sgd"])
 
     # ----  Model Arguments ----
-    parser.add_argument("--arch", type=str, default="r18l3",
+    parser.add_argument("--arch", type=str, default="r18",
                         choices=["vgg16",
                                  "r18",
                                  "r50",
-                                 "r101",
-                                 "eff"],
-                        # TODO: TOREMOVE eff(Net) va rimossa, valutare quali altre reti aggiungere/lasciare
+                                 "r101"],
                         help="_")
     parser.add_argument("--pooling", type=str, default="gem",
-                        choices=["netvlad", "gem", "spoc", "mac", "rmac", "crn"])
+                        choices=["gem", "spoc", "mac", "rmac", "crn"])
 
 
     # ---- Model's final FC layer ----

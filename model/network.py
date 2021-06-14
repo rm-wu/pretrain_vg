@@ -5,29 +5,18 @@ from torch import nn
 
 import model.pooling as pooling
 # from model.normalization import L2Norm
-from model.metric_learning import ArcMarginProduct # TODO: use this in the main.py file?
+from model.metric_learning import ArcMarginProduct
 
 
 class LandmarkNet(nn.Module):
     def __init__(self,
                  args,
-                 num_classes,
-                 # TODO: TOREMOVE
-                 # pooling='GeM',
-                 # args_pooling: dict={},
-                 # use_fc=False,
-                 #  fc_dim=512,
-                 # dropout=0.0,
-                 # loss_module='arcface',
-                 # s=30.0,
-                 # margin=0.50,
-                 # ls_eps=0.0
-                 ):
+                 num_classes):
         super(LandmarkNet, self).__init__()
         self.encoder = get_encoder(args)
         self.pooling = get_pooling(args)
 
-        self.use_fc = args.fc_output_dimension is not None  # TODO: add an ad-hoc argument ?
+        self.use_fc = args.fc_output_dimension is not None
         if self.use_fc:
             self.fc_layer = nn.Sequential(
                 nn.Dropout(p=args.fc_dropout),
@@ -77,20 +66,9 @@ class LandmarkNet(nn.Module):
         return x
 
 
-# TODO: TOREMOVE se non viene utilizzato nel pooling layer
-class Flatten(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, x):
-        assert x.shape[2] == x.shape[3] == 1
-        return x[:, :, 0, 0]
-
-
 def get_pooling(args):
     """
     Returns the chosen pooling layer
-    TODO: lasciare le normalizzazioni utilizzate in benchmarking_vg???
     """
     if args.pooling == "gem":
         return pooling.GeM()
@@ -100,18 +78,6 @@ def get_pooling(args):
         return pooling.MAC()
     elif args.pooling == "rmac":
         return pooling.RMAC()
-
-    # TODO: TOREMOVE ???
-    # if args.pooling == "gem":
-    #     return nn.Sequential(L2Norm(), # TOREMOVE ??
-    #                          pooling.GeM(),
-    #                          Flatten())
-    # elif args.pooling == "spoc":
-    #     return nn.Sequential(L2Norm(), pooling.SPoC(), Flatten())
-    # elif args.pooling == "mac":
-    #     return nn.Sequential(L2Norm(), pooling.MAC(), Flatten())
-    # elif args.pooling == "rmac":
-    #     return nn.Sequential(L2Norm(), pooling.RMAC(), Flatten())
 
 
 def get_encoder(args):

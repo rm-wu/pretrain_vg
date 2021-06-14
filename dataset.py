@@ -18,7 +18,7 @@ class LandmarkDataset(Dataset):
         self.class_ids = class_ids
         self.transform = transform
         self.base_transforms = transforms.Compose([
-            transforms.Resize((640, 480)),  # TODO: this resize does not take into account different shapes of GLDv2 images
+            transforms.Resize((224, 224)),  # ((640, 480)),  # TODO: this resize does not take into account different shapes of GLDv2 images
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225]),  # ImageNet Normalization
