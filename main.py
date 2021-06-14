@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 
 # TODO: utilizzare questa metrica
-from torchnet.meter import mAPMeter
+from model.metrics import gap
 
 import util
 import parser
@@ -36,7 +36,7 @@ device = args.device
 # ---- Dataloaders ----
 # TODO: move to parser this parameter (note in benchmarking_vg this is done in another way)
 #
-df_path = 'train_df_.pkl'
+df_path = 'train_df.pkl'
 train_dl, valid_dl, num_classes = dataset.prepare_dataloaders(dataset_name=args.dataset_name,
                                                               df_path=df_path,
                                                               train_batch_size=args.train_batch_size,
@@ -52,8 +52,8 @@ train_dl, valid_dl, num_classes = dataset.prepare_dataloaders(dataset_name=args.
 model = network.LandmarkNet(args=args,
                             num_classes=num_classes,  # dynamically obtained from the dataset
                             )
-model = torch.nn.DataParallel(model)
 model = model.to(device)
+model = torch.nn.DataParallel(model)
 
 logging.info(f"Number of classes for dataset {args.dataset_name} is {num_classes}")
 
@@ -67,7 +67,6 @@ criterion = nn.CrossEntropyLoss()
 
 # ---- Resume the model, optimizer, training_parameters ----
 if args.resume:
-    # TODO: Complete this part
     model, optimizer, best_acc, start_epoch_num, not_improved_num = util.resume_train(args, model, optimizer)
     logging.info(f"Resuming from epoch {start_epoch_num} with best accuracy {best_acc:.4f}")
 else:
@@ -81,7 +80,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
     # ---- Loss & Metric ----
     train_loss = metrics.AverageMeter()
     # TODO:
-    #  train_mAP = metrics.AverageMeter()
+    #  train_gap = metrics.AverageMeter()
     train_acc  = metrics.AverageMeter()
 
     model.train()
@@ -96,7 +95,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         loss = criterion(outputs, labels)
         acc = metrics.accuracy(outputs, labels)
         # TODO:
-        #  mAP =
+        #  gap =
 
         optimizer.zero_grad()
         loss.backward()
@@ -118,8 +117,8 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
     # ---- Loss & Metric ----
     valid_loss = metrics.AverageMeter()
     # TODO:
-    #  train_mAP = metrics.AverageMeter()
-    valid_acc  = metrics.AverageMeter()
+    #  train_gap = metrics.AverageMeter()
+    valid_acc = metrics.AverageMeter()
 
     model.eval()
     with torch.no_grad():
@@ -133,13 +132,10 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
             loss = criterion(outputs, labels)
             acc = metrics.accuracy(outputs, labels)
             # TODO:
-            #  mAP =
+            #  gap =
 
             valid_loss.update(loss.item(), batch_size)
             valid_acc.update(acc, batch_size)
-
-            if i % 100 == 99:
-                logging.info(f'{i} | loss: {train_loss.avg:.4f} | acc: {train_acc.avg:.4f}')
 
         logging.info(f"Validation : Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
                      f"average epoch loss = {valid_loss.avg:.4f}, "
@@ -153,13 +149,13 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
     # If accuracy did not improve for "many" epochs, stop training
     if is_best:
-        logging.info(f"Improved: previous best R@5 = {best_acc:.4f}, current R@5 = {valid_acc.avg:.4f}")
+        logging.info(f"Improved: previous best accuracy = {best_acc:.4f}, current accuracy = {valid_acc.avg:.4f}")
         best_acc = valid_acc.avg
         not_improved_num = 0
     else:
         not_improved_num += 1
         logging.info(
-            f"Not improved: {not_improved_num} / {args.patience}: best R@5 = {best_acc:.4f}, current R@5 = {valid_acc.avg:.4f}")
+            f"Not improved: {not_improved_num} / {args.patience}: best accuracy = {best_acc:.4f}, current accuracy = {valid_acc.avg:.4f}")
         if not_improved_num >= args.patience:
             logging.info(f"Performance did not improve for {not_improved_num} epochs. Stop training.")
             break
