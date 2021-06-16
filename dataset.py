@@ -96,13 +96,13 @@ def prepare_dataloaders(dataset_name, data_path, train_batch_size=32, eval_batch
                                                normalize
                                            ]))
         #valid_dataset = datasets.ImageFolder(root=valid_dir,
-        valid_dataset=datasets.Places365(root=train_dir,
-                                         split="val",
-                                         transform=transforms.Compose([
-                                             transforms.Scale(256),
-                                             transforms.CenterCrop(224),
-                                             transforms.ToTensor(),
-                                             normalize]))
+        valid_dataset = datasets.Places365(root=valid_dir,
+                                           split="val",
+                                           transform=transforms.Compose([
+                                               transforms.Resize(256),
+                                               transforms.CenterCrop(224),
+                                               transforms.ToTensor(),
+                                               normalize]))
 
         train_dl = DataLoader(dataset=train_dataset,
                               batch_size=train_batch_size,
