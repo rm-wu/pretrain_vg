@@ -86,19 +86,23 @@ def prepare_dataloaders(dataset_name, data_path, train_batch_size=32, eval_batch
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
         # Here the same augmentation techniques used in the official repository are employed
-        train_dataset = datasets.ImageFolder(root=train_dir,
-                                             transform=transforms.Compose([
-                                                 transforms.RandomSizedCrop(224),
-                                                 transforms.RandomHorizontalFlip(),
-                                                 transforms.ToTensor(),
-                                                 normalize
-                                             ]))
-        valid_dataset = datasets.ImageFolder(root=valid_dir,
-                                             transform=transforms.Compose([
-                                                 transforms.Scale(256),
-                                                 transforms.CenterCrop(224),
-                                                 transforms.ToTensor(),
-                                                 normalize]))
+        # train_dataset = datasets.ImageFolder(root=train_dir,
+        train_dataset = datasets.Places365(root=train_dir,
+                                           split="train-standard",
+                                           transform=transforms.Compose([
+                                               transforms.RandomSizedCrop(224),
+                                               transforms.RandomHorizontalFlip(),
+                                               transforms.ToTensor(),
+                                               normalize
+                                           ]))
+        #valid_dataset = datasets.ImageFolder(root=valid_dir,
+        valid_dataset=datasets.Places365(root=train_dir,
+                                         split="val",
+                                         transform=transforms.Compose([
+                                             transforms.Scale(256),
+                                             transforms.CenterCrop(224),
+                                             transforms.ToTensor(),
+                                             normalize]))
 
         train_dl = DataLoader(dataset=train_dataset,
                               batch_size=train_batch_size,
