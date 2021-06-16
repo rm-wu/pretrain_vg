@@ -26,9 +26,11 @@ def parse_arguments():
     parser.add_argument("--exp_name", type=str, default="default",
                         help="Folder name of the current run (saved in ./runs/)")
 
-    # ---- Dataloader Arguments ----
+    # ---- Dataset and DataLoader Arguments ----
     parser.add_argument("--dataset_name", type=str, default="gldv2",
                         choices=["gldv2", "places"], help="Name of the dataset.")
+    parser.add_argument("--data_path", type=str, default="",
+                        help="Directory of the dataset")
     parser.add_argument("--train_batch_size", type=int, default=32,
                         help="Number of images in the train batch size.")
     parser.add_argument("--eval_batch_size", type=int, default=64,
@@ -43,8 +45,8 @@ def parse_arguments():
                         help="Resizing shape for images (HxW).")
 
     # ---- loss_module Arguments ----
-    parser.add_argument("--loss_module", type=str, default='arcface', help="loss_module",
-                        choices=["arcface", "cosface", "softmax"])
+    parser.add_argument("--loss_module", type=str, default="", help="loss_module",
+                        choices=["arcface", ""])
     parser.add_argument('--arcface_s', type=float, default=30, help="s parameter of arcface loss")
     parser.add_argument('--arcface_margin', type=float, default=0.3, help="margin of arcface loss")
     parser.add_argument('--arcface_ls_eps', type=float, default=0.0, help="ls_eps of arcface loss. (label_smoothing)")

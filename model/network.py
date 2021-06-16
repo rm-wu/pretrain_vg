@@ -49,7 +49,7 @@ class LandmarkNet(nn.Module):
         nn.init.constant_(self.fc_layer[2].weight, 1)
         nn.init.constant_(self.fc_layer[2].bias, 0)
 
-    def forward(self, x, labels):
+    def forward(self, x, labels=None):
         x = self.extract_feat(x)
         if self.loss_module in ('arcface', 'cosface', 'adacos'):
             logits = self.final_layer(x, labels)

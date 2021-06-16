@@ -1,1 +1,5 @@
-
+TODO List:
+    1) aggiungere GAP come metrica (utilizzando il valore di softmax come confidence, tecnicamente non è corretto al
+       100% in quanto nella competition è utilizzata per distingure tra immagini che realmente rappresentano dei
+       landmarks)
+    2)

@@ -8,7 +8,6 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 
-# TODO: utilizzare questa metrica
 from model.metrics import gap
 
 import util
@@ -34,15 +33,14 @@ logging.info(f"The outputs are being saved in {args.output_folder}")
 device = args.device
 
 # ---- Dataloaders ----
-# TODO: move to parser this parameter (note in benchmarking_vg this is done in another way)
-#
-df_path = 'train_df.pkl'
 train_dl, valid_dl, num_classes = dataset.prepare_dataloaders(dataset_name=args.dataset_name,
-                                                              df_path=df_path,
+                                                              data_path=args.data_path,
                                                               train_batch_size=args.train_batch_size,
                                                               eval_batch_size=args.eval_batch_size,
                                                               test_size=args.test_size,
                                                               seed=args.seed,
+                                                              resize_shape=(int(args.resize_shape[0]),
+                                                                            int(args.resize_shape[1])),
                                                               train_transforms=None,
                                                               eval_transforms=None,
                                                               num_workers=args.num_workers)
@@ -56,6 +54,8 @@ model = model.to(device)
 model = torch.nn.DataParallel(model)
 
 logging.info(f"Number of classes for dataset {args.dataset_name} is {num_classes}")
+logging.info(f"Training Samples   : {len(train_dl.dataset)}")
+logging.info(f"Validation Samples : {len(valid_dl.dataset)}")
 
 # ---- Setup Optimizer and Loss ----
 if args.optim == "adam":
@@ -79,8 +79,6 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
     epoch_start_time = datetime.now()
     # ---- Loss & Metric ----
     train_loss = metrics.AverageMeter()
-    # TODO:
-    #  train_gap = metrics.AverageMeter()
     train_acc  = metrics.AverageMeter()
 
     model.train()
@@ -91,11 +89,9 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         images, labels = images.to(device), labels.to(device)
         batch_size = images.shape[0]
 
-        outputs = model(images, labels)
+        outputs = model(images, labels)  # with loss_module != 'arcface', labels are not used in the model
         loss = criterion(outputs, labels)
         acc = metrics.accuracy(outputs, labels)
-        # TODO:
-        #  gap =
 
         optimizer.zero_grad()
         loss.backward()
@@ -109,15 +105,13 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
     logging.info(f"Training: Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
                  f"average epoch loss = {train_loss.avg:.4f}, "
-                 f"average epoch accuracy = {train_acc.avg:.2f}")
+                 f"average epoch accuracy = {train_acc.avg:.4f}")
 
     # ---- Validation Step ----
     logging.info(f"Start validation epoch: {epoch_num:02d}/{args.epochs_num}")
     epoch_start_time = datetime.now()
     # ---- Loss & Metric ----
     valid_loss = metrics.AverageMeter()
-    # TODO:
-    #  train_gap = metrics.AverageMeter()
     valid_acc = metrics.AverageMeter()
 
     model.eval()
@@ -131,15 +125,13 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
             outputs = model(images, labels)
             loss = criterion(outputs, labels)
             acc = metrics.accuracy(outputs, labels)
-            # TODO:
-            #  gap =
 
             valid_loss.update(loss.item(), batch_size)
             valid_acc.update(acc, batch_size)
 
         logging.info(f"Validation : Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
                      f"average epoch loss = {valid_loss.avg:.4f}, "
-                     f"average epoch accuracy = {valid_acc.avg:.2f}")
+                     f"average epoch accuracy = {valid_acc.avg:.4f}")
 
     is_best = valid_acc.avg > best_acc
     # Save checkpoint, which contains all training parameters
