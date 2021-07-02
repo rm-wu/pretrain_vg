@@ -8,4 +8,3 @@ scikit_learn==0.24.1
 torchscan==0.1.1
 efficientnet_pytorch==0.7.1
 pandas>=1.0.0
-torchnet

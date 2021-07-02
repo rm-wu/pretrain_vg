@@ -54,7 +54,7 @@ class LandmarkNet(nn.Module):
         if self.loss_module in ('arcface', 'cosface', 'adacos'):
             logits = self.final_layer(x, labels)
         else:
-            logits = self.final(x)
+            logits = self.final_layer(x)
         return logits
 
     def extract_feat(self, x):
