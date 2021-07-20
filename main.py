@@ -1,6 +1,4 @@
-import math
 import logging
-import numpy as np
 from os.path import join
 from datetime import datetime
 from tqdm import tqdm
@@ -8,7 +6,7 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 
-from model.metrics import gap
+# from model.metrics import gap
 
 import util
 import parser
@@ -154,3 +152,13 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
 logging.info(f"Best acc: {best_acc:.4f}")
 logging.info(f"Trained for {epoch_num:02d} epochs, in total in {str(datetime.now() - start_time)[:-7]}")
+
+# ---- Test Model ----
+# test_ds = dataset.test_set()
+# best_model_state_dict = torch.load(f"{args.output_folder}/best_model.pth")["model_state_dict"]
+# model.load_state_dict(best_model_state_dict)
+#
+# test_acc = test.test(args, test_ds, model)
+# logging.info(f"Accuracy on {test_ds}: {test_acc}")
+
+

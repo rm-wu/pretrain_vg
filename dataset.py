@@ -11,7 +11,7 @@ import pandas as pd
 import os
 
 
-class LandmarkDataset(Dataset):
+class GoogleLandmarkDataset(Dataset):
     def __init__(self,
                  paths,
                  class_ids,
@@ -55,12 +55,12 @@ def prepare_dataloaders(dataset_name, data_path, train_batch_size=32, eval_batch
         #  to use stratify argument
         train_split, valid_split = train_test_split(df, test_size=test_size, random_state=seed)
 
-        train_dataset = LandmarkDataset(
+        train_dataset = GoogleLandmarkDataset(
             paths=train_split['path'].values,
             class_ids=train_split['landmark_id'].values,
             resize_shape=resize_shape,
             transform=train_transforms)
-        valid_dataset = LandmarkDataset(
+        valid_dataset = GoogleLandmarkDataset(
             paths=valid_split['path'].values,
             class_ids=valid_split['landmark_id'].values,
             resize_shape=resize_shape,
