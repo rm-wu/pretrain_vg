@@ -1,4 +1,6 @@
 import torch
+import h5py
+import io
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
@@ -11,14 +13,23 @@ import pandas as pd
 import os
 
 
+def path_to_pil_img(h5py_file_path, path):
+    with h5py.File(h5py_file_path, "r") as file:
+        binary_data = file[path]["_"][...]
+    return Image.open(io.BytesIO(binary_data)).convert("RGB")
+
+
 class GoogleLandmarkDataset(Dataset):
     def __init__(self,
-                 paths,
+                 image_list,
                  class_ids,
                  resize_shape,
-                 transform=None):
+                 transform=None,
+                 h5py_file_path=None):
         super().__init__()
-        self.paths = paths
+        if h5py_file_path is not None:
+            self.h5py_file_path = h5py_file_path
+        self.image_list = image_list
         self.class_ids = class_ids
         self.transform = transform
         self.base_transforms = transforms.Compose([
@@ -29,8 +40,12 @@ class GoogleLandmarkDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        img_path = str(self.paths[index])
-        img = Image.open(img_path).convert("RGB")
+        if self.h5py_file_path is not None:
+            img_path = self.image_list[index] + '.jpg'
+            img = path_to_pil_img(self.h5py_file_path, img_path)
+        else:
+            img_path = str(self.image_list[index])
+            img = Image.open(img_path).convert("RGB")
         assert img is not None, f'path: {img_path} is invalid'
         if self.transform is not None:
             img = self.transform(img)
@@ -39,9 +54,10 @@ class GoogleLandmarkDataset(Dataset):
         return img, label
 
     def __len__(self):
-        return len(self.paths)
+        return len(self.image_list)
 
 
+# TODO: TOREMOVE
 def prepare_dataloaders(dataset_name, data_path, train_batch_size=32, eval_batch_size=64,
                         test_size=0.0, seed=None, resize_shape=(224, 224), num_workers=0,
                         train_transforms=None, eval_transforms=None):
@@ -51,8 +67,6 @@ def prepare_dataloaders(dataset_name, data_path, train_batch_size=32, eval_batch
         # Read the pkl file that contains the paths and labels of each image and splits the training data into train and
         # validation sets
         df = pd.read_pickle(data_path)
-        # TODO: stratify to get the same data distribution? There are classes with only 1 sample --> it is not possible
-        #  to use stratify argument
         train_split, valid_split = train_test_split(df, test_size=test_size, random_state=seed)
 
         train_dataset = GoogleLandmarkDataset(
