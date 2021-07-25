@@ -29,8 +29,11 @@ def parse_arguments():
     # ---- Dataset and DataLoader Arguments ----
     parser.add_argument("--dataset_name", type=str, default="gldv2",
                         choices=["gldv2", "places"], help="Name of the dataset.")
+    parser.add_argument("--gldv2_csv", type=str, default=None,
+                        help="csv  file containing the metadata of GLDv2")
     parser.add_argument("--data_path", type=str, default="",
                         help="Directory of the dataset")
+
     parser.add_argument("--train_batch_size", type=int, default=32,
                         help="Number of images in the train batch size.")
     parser.add_argument("--eval_batch_size", type=int, default=64,
@@ -55,8 +58,8 @@ def parse_arguments():
     parser.add_argument("--epochs_num", type=int, default=1000,
                         help="number of epochs to train for")
     parser.add_argument("--patience", type=int, default=5)
-    parser.add_argument("--lr", type=float, default=0.001, help="_")
-    parser.add_argument("--optim", type=str, default="sgd", help="_", choices=["adam", "sgd"])
+    parser.add_argument("--lr", type=float, default=0.0001, help="_")
+    parser.add_argument("--optim", type=str, default="adam", help="_", choices=["adam", "sgd"])
 
     # ----  Model Arguments ----
     parser.add_argument("--arch", type=str, default="r18",
@@ -65,14 +68,15 @@ def parse_arguments():
                                  "r50",
                                  "r101"],
                         help="_")
-    parser.add_argument("--pooling", type=str, default="gem",
-                        choices=["gem", "spoc", "mac", "rmac", "crn"])
 
-
+    # TODO: TOREMOVE
+    # parser.add_argument("--pooling", type=str, default="gem",
+    #                    choices=["gem", "spoc", "mac", "rmac", "crn"])
     # ---- Model's final FC layer ----
-    parser.add_argument('--fc_output_dimension', type=int, default=512,     # default = smlyaka's fc_dim
-                        help="Output dimension of fully connected layer.")
-    parser.add_argument('--fc_dropout', type=float, default=0.0)
+    # parser.add_argument('--fc_output_dimension', type=int, default=512,     # default = smlyaka's fc_dim
+    #                    help="Output dimension of fully connected layer.")
+    # parser.add_argument('--fc_dropout', type=float, default=0.0)
+
     parser.add_argument("--resume", type=str, default=None,
                         help="Path to load checkpoint from, for resuming training or testing.")
 
@@ -84,4 +88,9 @@ def parse_arguments():
     #parser.add_argument("--test", type=str, default="test/gallery", help="Path test set")
 
     args = parser.parse_args()
+
+    if args.dataset_name == 'gldv2' and args.gldv2_csv is None:
+        raise ValueError("With datasets GLDv2 the csv file with images id and landmark_id must be passed using "
+                         "parameter --gldv2_csv")
+
     return args

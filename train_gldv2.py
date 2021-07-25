@@ -35,23 +35,24 @@ logging.info(f"The outputs are being saved in {args.output_folder}")
 device = args.device
 
 # ---- Dataloaders ----
-# Read the csv files containing the names and labels of the training images
-df = pd.read_csv(args.da)
+# Read the csv files containing the names and labels of the training images of GLDv2
+df = pd.read_csv(args.gldv2_csv)
 
 train_dataset = GoogleLandmarkDataset(
-    paths=df['id'].values,
+    image_list=df['id'].values,
     class_ids=df['landmark_id'].values,
     resize_shape=(int(args.resize_shape[0]),
-                  int(args.resize_shape[1])),
+                  int(args.resize_shape[1])), h5py_file_path=args.data_path
     )
 
 train_dl = DataLoader(dataset=train_dataset,
                       batch_size=args.train_batch_size,
                       shuffle=True,
                       num_workers=args.num_workers,
-                      pin_memory=True)
+                      pin_memory=True,
+                      drop_last=True)
 
-num_classes = df['landmark_id'].max() + 1
+num_classes = df['landmark_id'].max() + 1   # Classes go from 0 to max()
 
 # ---- Model ----
 # instantiate the model, using ImageNet pretrained nets from torchvision
