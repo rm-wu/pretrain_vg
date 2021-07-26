@@ -24,12 +24,15 @@ class GoogleLandmarkDataset(Dataset):
                  class_ids,
                  resize_shape,
                  transform=None,
+                 root_dir=None,
                  h5py_file_path=None):
         super().__init__()
 
         if h5py_file_path is not None:
             self.h5py_file_path = h5py_file_path
             self.h5_dataset = None
+        else:
+            self.root_dir = root_dir
 
         self.image_list = image_list
         self.class_ids = class_ids
@@ -49,6 +52,7 @@ class GoogleLandmarkDataset(Dataset):
             img = path_to_pil_img(img_path, self.h5_dataset)
         else:
             img_path = str(self.image_list[index])
+            img_path = os.path.join(self.root_dir, img_path[0], img_path[1], img_path[2], img_path + '.jpg')
             img = Image.open(img_path).convert("RGB")
         assert img is not None, f'path: {img_path} is invalid'
         if self.transform is not None:

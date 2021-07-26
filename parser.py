@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument("--data_path", type=str, default="",
                         help="Directory of the dataset")
 
-    parser.add_argument("--train_batch_size", type=int, default=32,
+    parser.add_argument("--train_batch_size", type=int, default=128,
                         help="Number of images in the train batch size.")
     parser.add_argument("--eval_batch_size", type=int, default=64,
                         help="Number of images in the eval batch size.")

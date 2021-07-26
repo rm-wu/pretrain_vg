@@ -42,7 +42,8 @@ train_dataset = GoogleLandmarkDataset(
     image_list=df['id'].values,
     class_ids=df['landmark_id'].values,
     resize_shape=(int(args.resize_shape[0]),
-                  int(args.resize_shape[1])), h5py_file_path=args.data_path
+                  int(args.resize_shape[1])),
+    h5py_file_path=args.data_path
     )
 
 train_dl = DataLoader(dataset=train_dataset,
