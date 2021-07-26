@@ -31,8 +31,10 @@ class GoogleLandmarkDataset(Dataset):
         if h5py_file_path is not None:
             self.h5py_file_path = h5py_file_path
             self.h5_dataset = None
+            self.use_h5 = True
         else:
             self.root_dir = root_dir
+            self.use_h5 = False
 
         self.image_list = image_list
         self.class_ids = class_ids
@@ -45,7 +47,7 @@ class GoogleLandmarkDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        if self.h5py_file_path is not None:
+        if self.use_h5:
             img_path = self.image_list[index] + '.jpg'
             if self.h5_dataset is None:
                 self.h5_dataset = h5py.File(self.h5py_file_path, "r")
