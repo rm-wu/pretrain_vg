@@ -9,12 +9,9 @@ import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 from torchvision import transforms, datasets
 
-# from model.metrics import gap
-
 import util
 import parser
 import commons
-import dataset
 from model import network, metrics
 from dataset import GoogleLandmarkDataset
 

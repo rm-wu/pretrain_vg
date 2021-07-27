@@ -26,7 +26,7 @@ class LandmarkNet(nn.Module):
         if self.loss_module == 'arcface':
             logits = self.final_layer(x.squeeze(), labels)
         else:
-            logits = self.final_layer(x)
+            logits = self.final_layer(x.squeeze())
         return logits
 
 

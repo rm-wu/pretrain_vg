@@ -40,8 +40,6 @@ def parse_arguments():
                         help="Number of images in the eval batch size.")
     parser.add_argument("--seed", type=int, default=0,
                         help="Seed used to generate the splits in train/val set.")
-    parser.add_argument("--test_size", type=float, default=0.2,
-                        help="Percentage of the train set to use as validation set.")
     parser.add_argument("--num_workers", type=int, default=multiprocessing.cpu_count(),
                         help="num_workers for all dataloaders")
     parser.add_argument('--resize_shape', type=int, default=[224, 224], nargs=2,
@@ -68,14 +66,6 @@ def parse_arguments():
                                  "r50",
                                  "r101"],
                         help="_")
-
-    # TODO: TOREMOVE
-    # parser.add_argument("--pooling", type=str, default="gem",
-    #                    choices=["gem", "spoc", "mac", "rmac", "crn"])
-    # ---- Model's final FC layer ----
-    # parser.add_argument('--fc_output_dimension', type=int, default=512,     # default = smlyaka's fc_dim
-    #                    help="Output dimension of fully connected layer.")
-    # parser.add_argument('--fc_dropout', type=float, default=0.0)
 
     parser.add_argument("--resume", type=str, default=None,
                         help="Path to load checkpoint from, for resuming training or testing.")

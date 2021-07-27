@@ -33,22 +33,21 @@ logging.info(f"The outputs are being saved in {args.output_folder}")
 device = args.device
 
 # ---- Dataloaders ----
-train_dir = join(args.data_path, 'train')
-valid_dir = join(args.data_path, 'val')
+# train_dir = join(args.data_path, 'train')
+# valid_dir = join(args.data_path, 'val')
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
 # Here the same augmentation techniques used in the official repository are employed
-train_dataset = datasets.Places365(root=train_dir,
+train_dataset = datasets.Places365(root=args.data_path,
                                    split="train-standard",
                                    transform=transforms.Compose([
-                                       transforms.RandomSizedCrop(224),
+                                       transforms.RandomResizedCrop(224),
                                        transforms.RandomHorizontalFlip(),
                                        transforms.ToTensor(),
                                        normalize
                                    ]))
-# valid_dataset = datasets.ImageFolder(root=valid_dir,
-valid_dataset = datasets.Places365(root=valid_dir,
+valid_dataset = datasets.Places365(root=args.data_path,
                                    split="val",
                                    transform=transforms.Compose([
                                        transforms.Resize(256),
