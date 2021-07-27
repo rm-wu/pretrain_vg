@@ -13,8 +13,9 @@ import pandas as pd
 import os
 
 
-def path_to_pil_img(path, h5_file):
-    binary_data = h5_file[path]["_"][...]
+def path_to_pil_img(path, h5py_file_path):
+    with h5py.File(h5py_file_path, 'r') as h5_file:
+        binary_data = h5_file[path]["_"][...]
     return Image.open(io.BytesIO(binary_data)).convert("RGB")
 
 
@@ -30,7 +31,6 @@ class GoogleLandmarkDataset(Dataset):
 
         if h5py_file_path is not None:
             self.h5py_file_path = h5py_file_path
-            self.h5_dataset = None
             self.use_h5 = True
         else:
             self.root_dir = root_dir
@@ -49,9 +49,7 @@ class GoogleLandmarkDataset(Dataset):
     def __getitem__(self, index):
         if self.use_h5:
             img_path = self.image_list[index] + '.jpg'
-            if self.h5_dataset is None:
-                self.h5_dataset = h5py.File(self.h5py_file_path, "r")
-            img = path_to_pil_img(img_path, self.h5_dataset)
+            img = path_to_pil_img(img_path, os.path.join(self.h5py_file_path, img_path[:3] + '.h5py'))
         else:
             img_path = str(self.image_list[index])
             img_path = os.path.join(self.root_dir, img_path[0], img_path[1], img_path[2], img_path + '.jpg')
