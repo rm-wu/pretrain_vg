@@ -33,12 +33,8 @@ logging.info(f"The outputs are being saved in {args.output_folder}")
 device = args.device
 
 # ---- Dataloaders ----
-# train_dir = join(args.data_path, 'train')
-# valid_dir = join(args.data_path, 'val')
-
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-# Here the same augmentation techniques used in the official repository are employed
 train_dataset = datasets.Places365(root=args.data_path,
                                    split="train-standard",
                                    transform=transforms.Compose([
@@ -67,6 +63,7 @@ valid_dl = DataLoader(dataset=valid_dataset,
                       pin_memory=True)
 
 num_classes = 365  # Places365 contains 365 classes
+args.features_dim = 365  # For places the ArcFaceLoss module is not needed
 
 # ---- Model ----
 # instantiate the model, using ImageNet pretrained nets from torchvision
@@ -112,7 +109,7 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
         images, labels = images.to(device), labels.to(device)
         batch_size = images.shape[0]
 
-        outputs = model(images, labels)  # with loss_module != 'arcface', labels are not used in the model
+        outputs = model(images)
         loss = criterion(outputs, labels)
         acc = metrics.accuracy(outputs, labels)
 
@@ -122,9 +119,6 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
         train_loss.update(loss.item(), batch_size)
         train_acc.update(acc, batch_size)
-
-        if i % 10000 == 9999:
-            logging.info(f'{i} | loss: {train_loss.avg:.4f} | acc: {train_acc.avg:.4f}')
 
     logging.info(f"Training: Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
                  f"average epoch loss = {train_loss.avg:.4f}, "

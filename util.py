@@ -23,7 +23,6 @@ def resume_train(args, model, optimizer=None, strict=False):
     not_improved_num = checkpoint["not_improved_num"]
     logging.debug(f"Loaded checkpoint: start_epoch_num = {start_epoch_num}, " \
                   f"current_accuracy = {accuracy:.4f}")
-    if args.resume.endswith("last_model.pth"):  # Copy best model to current output_folder
-        shutil.copy(args.resume.replace("last_model.pth", "best_model.pth"), args.output_folder)
+    shutil.copy(args.resume, args.output_folder)
     return model, optimizer, accuracy, start_epoch_num, not_improved_num
 

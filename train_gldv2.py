@@ -51,12 +51,11 @@ train_dl = DataLoader(dataset=train_dataset,
                       drop_last=True)
 
 num_classes = df['landmark_id'].max() + 1   # Classes go from 0 to max()
+args.features_dim = 512
 
 # ---- Model ----
 # instantiate the model, using ImageNet pretrained nets from torchvision
-model = network.LandmarkNet(args=args,
-                            num_classes=num_classes,  # dynamically obtained from the dataset
-                            )
+model = network.LandmarkNet(args=args, num_classes=num_classes)
 model = model.to(device)
 model = torch.nn.DataParallel(model)
 
@@ -105,9 +104,6 @@ for epoch_num in range(start_epoch_num, args.epochs_num):
 
         train_loss.update(loss.item(), batch_size)
         train_acc.update(acc, batch_size)
-
-        if i % 10000 == 9999:
-            logging.info(f'{i} | loss: {train_loss.avg:.4f} | acc: {train_acc.avg:.4f}')
 
     logging.info(f"Training: Finished epoch {epoch_num:02d} in {str(datetime.now() - epoch_start_time)[:-7]}, "
                  f"average epoch loss = {train_loss.avg:.4f}, "

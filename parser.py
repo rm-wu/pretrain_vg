@@ -11,7 +11,7 @@ def _get_all_datasets_path():  # TOREMOVE
         return "/home/valerio/datasets"
     elif hostname == "hermes":
         return "/home/valerio/datasets/"
-    elif hostname.startswith("node") or hostname == "frontend": # TODO: è corretto per classification (Nota: caricare il .pkl per avere il dataframe)
+    elif hostname.startswith("node") or hostname == "frontend":
         return "/scratch/gabriele/datasets/auto_data/auto_data8/datasets"  # Cluster PoliMi
     else:
         raise RuntimeError(f"Dove sto girando??? Non conosco l'host {hostname}, aggiungilo")

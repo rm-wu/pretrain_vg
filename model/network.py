@@ -18,16 +18,12 @@ class LandmarkNet(nn.Module):
                                                 m=args.arcface_margin,
                                                 easy_margin=False,
                                                 ls_eps=args.arcface_ls_eps)  # label smoothing
-        else:
-            self.final_layer = nn.Linear(args.features_dim, num_classes)
 
     def forward(self, x, labels=None):
         x = self.encoder(x)
         if self.loss_module == 'arcface':
-            logits = self.final_layer(x.squeeze(), labels)
-        else:
-            logits = self.final_layer(x.squeeze())
-        return logits
+            x = self.final_layer(x, labels)
+        return x
 
 
 def get_encoder(args):
@@ -41,15 +37,10 @@ def get_encoder(args):
             encoder = torchvision.models.resnet50(pretrained=True)
         elif args.arch.startswith("r101"):
             encoder = torchvision.models.resnet101(pretrained=True)
+        encoder.fc = nn.Linear(encoder.fc.in_features, args.features_dim)
+
     elif args.arch == "vgg16":
         encoder = torchvision.models.vgg16(pretrained=True)
-    # Drop original final linear layer
-    encoder = nn.Sequential(*(list(encoder.children())[:-1]))
-    # Dynamically obtain number of channels in output
-    args.features_dim = get_output_channels_dim(encoder)
+        encoder.classifier[6] = nn.Linear(encoder.classifier[6].in_features, args.features_dim)
+
     return encoder
-
-
-def get_output_channels_dim(model):
-    """Return the number of channels in the output of a model."""
-    return model(torch.ones([1, 3, 224, 224])).shape[1]
