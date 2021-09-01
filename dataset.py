@@ -1,22 +1,9 @@
 import torch
-import h5py
-import io
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-from torch.utils.data.dataloader import DataLoader
 
-
-from sklearn.model_selection import train_test_split
 from PIL import Image
-import pandas as pd
 import os
-
-
-def path_to_pil_img(path, h5py_file_path):
-    with h5py.File(h5py_file_path, 'r') as h5_file:
-        binary_data = h5_file[path]["_"][...]
-    return Image.open(io.BytesIO(binary_data)).convert("RGB")
 
 
 class GoogleLandmarkDataset(Dataset):
@@ -24,18 +11,11 @@ class GoogleLandmarkDataset(Dataset):
                  image_list,
                  class_ids,
                  resize_shape,
-                 transform=None,
-                 root_dir=None,
-                 h5py_file_path=None):
+                 data_path,
+                 transform=None):
         super().__init__()
 
-        if h5py_file_path is not None:
-            self.h5py_file_path = h5py_file_path
-            self.use_h5 = True
-        else:
-            self.root_dir = root_dir
-            self.use_h5 = False
-
+        self.data_path = data_path
         self.image_list = image_list
         self.class_ids = class_ids
         self.transform = transform
@@ -47,13 +27,9 @@ class GoogleLandmarkDataset(Dataset):
         ])
 
     def __getitem__(self, index):
-        if self.use_h5:
-            img_path = self.image_list[index] + '.jpg'
-            img = path_to_pil_img(img_path, os.path.join(self.h5py_file_path, img_path[:3] + '.h5py'))
-        else:
-            img_path = str(self.image_list[index])
-            img_path = os.path.join(self.root_dir, img_path[0], img_path[1], img_path[2], img_path + '.jpg')
-            img = Image.open(img_path).convert("RGB")
+        img_path = str(self.image_list[index])
+        img_path = os.path.join(self.data_path, img_path[0], img_path[1], img_path[2], img_path + '.jpg')
+        img = Image.open(img_path).convert("RGB")
         assert img is not None, f'path: {img_path} is invalid'
         if self.transform is not None:
             img = self.transform(img)

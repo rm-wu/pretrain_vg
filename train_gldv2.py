@@ -28,7 +28,6 @@ commons.make_deterministic(args.seed)
 
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {args.output_folder}")
-# args.dataset_root = join(args.all_datasets_path, args.dataset_root)
 device = args.device
 
 # ---- Dataloaders ----
@@ -36,11 +35,11 @@ device = args.device
 df = pd.read_csv(args.gldv2_csv)
 
 train_dataset = GoogleLandmarkDataset(
+    data_path=args.data_path,
     image_list=df['id'].values,
     class_ids=df['landmark_id'].values,
     resize_shape=(int(args.resize_shape[0]),
                   int(args.resize_shape[1])),
-    h5py_file_path=args.data_path
     )
 
 train_dl = DataLoader(dataset=train_dataset,
