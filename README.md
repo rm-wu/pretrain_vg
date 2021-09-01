@@ -9,8 +9,8 @@ This repository is part of the framework proposed in our work "Deep Visual Geo-l
 
 ### Usage
 
-  <summary><b>Training on GLDv2</b></summary><br/>
-  For GLDv2, the backbone used in our work were trained for 30 epochs on the full GLDv2 training set.
+#### Training on GLDv2
+For GLDv2, the backbone used in our work were trained for 30 epochs on the full GLDv2 training set.
 To launch the training procedure use : 
  
   ```
@@ -31,8 +31,9 @@ To launch the training procedure use :
   For more details use
   ``` python3 train_gldv2.py -h ```
 
-  <summary><b>Training on Places365 </b></summary><br/>
-   For Places365, the backbone used in our work were trained until convergence using early stopping with patience equals to `5`.  
+
+#### Training on Places365
+For Places365, the backbone used in our work were trained until convergence using early stopping with patience equals to `5`.  
    
 ```
 python3 train_places.py [-h] [--device {cuda,cpu}] [--exp_name EXP_NAME]
@@ -41,9 +42,6 @@ python3 train_places.py [-h] [--device {cuda,cpu}] [--exp_name EXP_NAME]
                        [--eval_batch_size EVAL_BATCH_SIZE] [--seed SEED]
                        [--num_workers NUM_WORKERS]
                        [--resize_shape RESIZE_SHAPE RESIZE_SHAPE]
-                       [--loss_module {arcface,}] [--arcface_s ARCFACE_S]
-                       [--arcface_margin ARCFACE_MARGIN]
-                       [--arcface_ls_eps ARCFACE_LS_EPS]
                        [--epochs_num EPOCHS_NUM] [--patience PATIENCE]
                        [--lr LR] [--optim {adam,sgd}]
                        [--arch {vgg16,r18,r50,r101}] [--resume RESUME]  
