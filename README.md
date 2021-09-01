@@ -47,4 +47,4 @@ python3 train_places.py [-h] [--device {cuda,cpu}] [--exp_name EXP_NAME]
                        [--arch {vgg16,r18,r50,r101}] [--resume RESUME]  
   ```                     
   For more details use
-  ``` python3 train_gldv2.py -h ```
+  ``` python3 train_places.py -h ```
