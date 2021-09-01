@@ -10,14 +10,17 @@ class LandmarkNet(nn.Module):
                  num_classes):
         super(LandmarkNet, self).__init__()
         self.encoder = get_encoder(args)
-        self.loss_module = args.loss_module
-        if self.loss_module == 'arcface':
-            self.final_layer = ArcMarginProduct(args.features_dim, num_classes,
-                                                device=args.device,
-                                                s=args.arcface_s,
-                                                m=args.arcface_margin,
-                                                easy_margin=False,
-                                                ls_eps=args.arcface_ls_eps)  # label smoothing
+        if args.dataset_name == 'gldv2':
+            self.loss_module = args.loss_module
+            if self.loss_module == 'arcface':
+                self.final_layer = ArcMarginProduct(args.features_dim, num_classes,
+                                                    device=args.device,
+                                                    s=args.arcface_s,
+                                                    m=args.arcface_margin,
+                                                    easy_margin=False,
+                                                    ls_eps=args.arcface_ls_eps)  # label smoothing
+        else:
+            self.loss_module = ""
 
     def forward(self, x, labels=None):
         x = self.encoder(x)

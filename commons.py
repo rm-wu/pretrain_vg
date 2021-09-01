@@ -1,7 +1,3 @@
-"""
-This file contains some functions and classes which can be useful in many projects.
-"""
-
 import os
 import sys
 import torch
@@ -9,55 +5,6 @@ import random
 import logging
 import traceback
 import numpy as np
-
-
-class Table:
-    """This class is used to pretty-print tables of data, similar to https://pypi.org/project/tabulate/
-    It is not used during training.
-    TOREMOVE
-    """
-
-    def __init__(self, header=None):
-        self.header = header;
-        self.rows = []
-
-    def add(self, row):
-        if self.header != None or len(self.rows) != 0:
-            assert len(row) == self.num_cols(), f"Different len: {len(row)} {self.num_cols()}"
-        self.rows.append(row)
-
-    def num_cols(self):
-        if self.header != None:
-            return len(self.header)
-        else:
-            return len(self.rows[0])
-
-    def num_rows(self):
-        return len(self.rows)
-
-    def show(self, line_number=True, sep="   "):
-        def _s_(obj):
-            return str(obj).replace("\n", "")
-
-        if self.header == None and len(self.rows) == 0: return "Tabella vuota"
-        if self.header != None:
-            all_rows = [self.header] + self.rows
-        else:
-            all_rows = self.rows
-        col_widths = [max([len(_s_(all_rows[r][c])) for r in range(len(all_rows))]) for c in range(self.num_cols())]
-        table = [[f"{_s_(all_rows[r][c]):<{col_widths[c]}}" for c in range(self.num_cols())] for r in
-                 range(len(all_rows))]
-        if line_number:
-            table = "\n".join([f"{i:2d}  " + sep.join(row) for i, row in enumerate(table)])
-        else:
-            table = "\n".join([sep.join(row) for row in table])
-        return table
-
-    def __repr__(self):
-        print(self.show()); return ""
-
-    def sort(self, col_index):
-        self.rows = sorted(self.rows, key=lambda x: x[col_index])
 
 
 def make_deterministic(seed=0):

@@ -2,22 +2,7 @@ import socket
 import argparse
 import multiprocessing
 
-
-def _get_all_datasets_path():  # TOREMOVE
-    """Restituisce il path con tutti i dataset, a seconda del nome dell'host su cui eseguo il codice,
-    così non bisogna passare il parametro ogni volta"""
-    hostname = socket.gethostname()
-    if hostname == "gaber":
-        return "/home/valerio/datasets"
-    elif hostname == "hermes":
-        return "/home/valerio/datasets/"
-    elif hostname.startswith("node") or hostname == "frontend":
-        return "/scratch/gabriele/datasets/auto_data/auto_data8/datasets"  # Cluster PoliMi
-    else:
-        raise RuntimeError(f"Dove sto girando??? Non conosco l'host {hostname}, aggiungilo")
-
-
-def parse_arguments():
+def parse_arguments(dataset_name):
     parser = argparse.ArgumentParser(description="Pretrain for Benchmarking Visual Geolocalization",
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # ---- Generic Arguments ----
@@ -27,17 +12,17 @@ def parse_arguments():
                         help="Folder name of the current run (saved in ./runs/)")
 
     # ---- Dataset and DataLoader Arguments ----
-    parser.add_argument("--dataset_name", type=str, default="gldv2",
-                        choices=["gldv2", "places"], help="Name of the dataset.")
-    parser.add_argument("--gldv2_csv", type=str, default=None,
-                        help="csv  file containing the metadata of GLDv2")
+    if dataset_name == 'gldv2':
+        parser.add_argument("--gldv2_csv", type=str, default=None,
+                            help="csv  file containing the metadata of GLDv2")
+    elif dataset_name == 'places':
+        parser.add_argument("--eval_batch_size", type=int, default=64,
+                            help="Number of images in the eval batch size.")
+
     parser.add_argument("--data_path", type=str, default="",
                         help="Directory of the dataset")
-
     parser.add_argument("--train_batch_size", type=int, default=128,
                         help="Number of images in the train batch size.")
-    parser.add_argument("--eval_batch_size", type=int, default=64,
-                        help="Number of images in the eval batch size.")
     parser.add_argument("--seed", type=int, default=0,
                         help="Seed used to generate the splits in train/val set.")
     parser.add_argument("--num_workers", type=int, default=multiprocessing.cpu_count(),
@@ -46,11 +31,12 @@ def parse_arguments():
                         help="Resizing shape for images (HxW).")
 
     # ---- loss_module Arguments ----
-    parser.add_argument("--loss_module", type=str, default="", help="loss_module",
-                        choices=["arcface", ""])
-    parser.add_argument('--arcface_s', type=float, default=30, help="s parameter of arcface loss")
-    parser.add_argument('--arcface_margin', type=float, default=0.3, help="margin of arcface loss")
-    parser.add_argument('--arcface_ls_eps', type=float, default=0.0, help="ls_eps of arcface loss. (label_smoothing)")
+    if dataset_name == 'gldv2':
+        parser.add_argument("--loss_module", type=str, default="", help="loss_module",
+                            choices=["arcface", ""])
+        parser.add_argument('--arcface_s', type=float, default=30, help="s parameter of arcface loss")
+        parser.add_argument('--arcface_margin', type=float, default=0.3, help="margin of arcface loss")
+        parser.add_argument('--arcface_ls_eps', type=float, default=0.0, help="ls_eps of arcface loss. (label_smoothing)")
 
     # ---- Training and Optimizer Arguments ----
     parser.add_argument("--epochs_num", type=int, default=1000,
@@ -70,15 +56,9 @@ def parse_arguments():
     parser.add_argument("--resume", type=str, default=None,
                         help="Path to load checkpoint from, for resuming training or testing.")
 
-    # PATHS
-    #parser.add_argument("--all_datasets_path", type=str, default=_get_all_datasets_path(), help="Path with all datasets")  # TOREMOVE
-    #parser.add_argument("--dataset_root", type=str, default=None, help="Path of the dataset")
-    #parser.add_argument("--train", type=str, default="train/", help="Path train set")
-    #parser.add_argument("--val", type=str, default="val/gallery", help="Path val set")
-    #parser.add_argument("--test", type=str, default="test/gallery", help="Path test set")
-
     args = parser.parse_args()
 
+    args.dataset_name = dataset_name
     if args.dataset_name == 'gldv2' and args.gldv2_csv is None:
         raise ValueError("With datasets GLDv2 the csv file with images id and landmark_id must be passed using "
                          "parameter --gldv2_csv")

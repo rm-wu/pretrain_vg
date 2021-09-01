@@ -20,7 +20,7 @@ torch.backends.cudnn.benchmark = True  # Provides a speedup
 
 
 # ----  Initial setup: parser, logging... ----
-args = parser.parse_arguments()
+args = parser.parse_arguments('places')
 start_time = datetime.now()
 args.output_folder = join("runs", args.exp_name, start_time.strftime('%Y-%m-%d_%H-%M-%S'))
 
@@ -29,7 +29,6 @@ commons.make_deterministic(args.seed)
 
 logging.info(f"Arguments: {args}")
 logging.info(f"The outputs are being saved in {args.output_folder}")
-# args.dataset_root = join(args.all_datasets_path, args.dataset_root)
 device = args.device
 
 # ---- Dataloaders ----
